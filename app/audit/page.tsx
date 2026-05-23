@@ -8,6 +8,8 @@ export default function AuditPage() {
   const router = useRouter();
 
   const [tool, setTool] = useState("ChatGPT");
+  const [secondTool, setSecondTool] = useState("Claude");
+
   const [spend, setSpend] = useState("");
   const [teamSize, setTeamSize] = useState("");
 
@@ -15,6 +17,7 @@ export default function AuditPage() {
 
     const auditData = {
       tool,
+      secondTool,
       spend,
       teamSize,
     };
@@ -36,9 +39,11 @@ export default function AuditPage() {
 
       <div className="max-w-2xl mx-auto mt-10 space-y-6">
 
+        {/* First Tool */}
+
         <div>
           <label className="block mb-2 text-sm">
-            Tool Name
+            Primary Tool
           </label>
 
           <select
@@ -52,6 +57,27 @@ export default function AuditPage() {
             <option>GitHub Copilot</option>
           </select>
         </div>
+
+        {/* Second Tool */}
+
+        <div>
+          <label className="block mb-2 text-sm">
+            Secondary Tool
+          </label>
+
+          <select
+            value={secondTool}
+            onChange={(e) => setSecondTool(e.target.value)}
+            className="w-full p-3 rounded-xl bg-zinc-900 border border-zinc-700"
+          >
+            <option>Claude</option>
+            <option>ChatGPT</option>
+            <option>Cursor</option>
+            <option>GitHub Copilot</option>
+          </select>
+        </div>
+
+        {/* Spend */}
 
         <div>
           <label className="block mb-2 text-sm">
@@ -67,6 +93,8 @@ export default function AuditPage() {
           />
         </div>
 
+        {/* Team Size */}
+
         <div>
           <label className="block mb-2 text-sm">
             Team Size
@@ -80,6 +108,8 @@ export default function AuditPage() {
             className="w-full p-3 rounded-xl bg-zinc-900 border border-zinc-700"
           />
         </div>
+
+        {/* Button */}
 
         <button
           onClick={handleSubmit}
