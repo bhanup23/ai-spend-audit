@@ -1,10 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { generateAudit } from "@/lib/auditEngine";
 import { supabase } from "@/lib/supabase";
 
 export default function ResultsPage() {
+
+  const router = useRouter();
 
   const [data, setData] = useState<any>(null);
 
@@ -19,6 +22,7 @@ export default function ResultsPage() {
   }, []);
 
   if (!data) {
+
     return (
       <main className="min-h-screen bg-black text-white flex items-center justify-center">
         Loading...
@@ -33,7 +37,7 @@ export default function ResultsPage() {
 
   const annualSavings = audit.totalSavings * 12;
 
-  // Save audit to Supabase
+  // Save audit and redirect to public report
 
   async function saveAudit() {
 
@@ -57,9 +61,9 @@ export default function ResultsPage() {
       return;
     }
 
-    console.log("Saved audit:", savedAudit);
+    const auditId = savedAudit?.[0]?.id;
 
-    alert("Audit saved successfully!");
+    router.push(`/report/${auditId}`);
   }
 
   return (
@@ -120,6 +124,7 @@ export default function ResultsPage() {
               <div className="flex items-center justify-between">
 
                 <div>
+
                   <p className="text-zinc-400 text-sm">
                     Tool
                   </p>
@@ -127,9 +132,11 @@ export default function ResultsPage() {
                   <h4 className="text-2xl font-bold mt-1">
                     {item.tool}
                   </h4>
+
                 </div>
 
                 <div className="text-right">
+
                   <p className="text-zinc-400 text-sm">
                     Savings
                   </p>
@@ -137,6 +144,7 @@ export default function ResultsPage() {
                   <p className="text-green-400 text-2xl font-bold">
                     ${item.savings}/mo
                   </p>
+
                 </div>
 
               </div>
@@ -165,7 +173,7 @@ export default function ResultsPage() {
 
       </div>
 
-      {/* Supabase Test Button */}
+      {/* Save + Share Button */}
 
       <div className="max-w-4xl mx-auto mt-10">
 
@@ -173,7 +181,7 @@ export default function ResultsPage() {
           onClick={saveAudit}
           className="w-full bg-green-500 text-black py-4 rounded-2xl font-bold hover:scale-[1.02]"
         >
-          Test Supabase Connection
+          Save & Generate Shareable Report
         </button>
 
       </div>
