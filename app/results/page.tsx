@@ -1,5 +1,7 @@
 "use client";
 
+import { generateAudit } from "@/lib/auditEngine";
+
 import { useEffect, useState } from "react";
 
 export default function ResultsPage() {
@@ -11,7 +13,11 @@ export default function ResultsPage() {
     const savedData = localStorage.getItem("auditData");
 
     if (savedData) {
-      setData(JSON.parse(savedData));
+      try {
+        setData(JSON.parse(savedData));
+      } catch {
+        setData(null);
+      }
     }
 
   }, []);
@@ -24,10 +30,11 @@ export default function ResultsPage() {
     );
   }
 
-  const savings =
-    Number(data.teamSize) <= 2
-      ? 40
-      : 0;
+  const audit = generateAudit(
+    data.tool,
+    Number(data.spend),
+    Number(data.teamSize)
+  );
 
   return (
     <main className="min-h-screen bg-black text-white px-6 py-12">
@@ -43,7 +50,7 @@ export default function ResultsPage() {
         </h2>
 
         <p className="text-6xl font-bold mt-4 text-green-400">
-          ${savings}/month
+          ${audit.savings}/month
         </p>
 
         <div className="mt-8 space-y-4">
@@ -59,11 +66,13 @@ export default function ResultsPage() {
             </p>
 
             <p className="mt-1">
-              Switch to a cheaper plan.
+               {audit.recommendation}
             </p>
-
+            <p className="mt-2 text-zinc-400">
+              {audit.reason}
+            </p>
             <p className="mt-3 text-green-400">
-              Estimated Savings: ${savings}/month
+              Estimated Savings: ${audit.savings}/month
             </p>
 
           </div>
