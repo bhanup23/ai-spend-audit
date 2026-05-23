@@ -1,4 +1,32 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+
 export default function AuditPage() {
+
+  const router = useRouter();
+
+  const [tool, setTool] = useState("ChatGPT");
+  const [spend, setSpend] = useState("");
+  const [teamSize, setTeamSize] = useState("");
+
+  function handleSubmit() {
+
+    const auditData = {
+      tool,
+      spend,
+      teamSize,
+    };
+
+    localStorage.setItem(
+      "auditData",
+      JSON.stringify(auditData)
+    );
+
+    router.push("/results");
+  }
+
   return (
     <main className="min-h-screen bg-black text-white px-6 py-12">
 
@@ -13,7 +41,11 @@ export default function AuditPage() {
             Tool Name
           </label>
 
-          <select className="w-full p-3 rounded-xl bg-zinc-900 border border-zinc-700">
+          <select
+            value={tool}
+            onChange={(e) => setTool(e.target.value)}
+            className="w-full p-3 rounded-xl bg-zinc-900 border border-zinc-700"
+          >
             <option>ChatGPT</option>
             <option>Claude</option>
             <option>Cursor</option>
@@ -29,6 +61,8 @@ export default function AuditPage() {
           <input
             type="number"
             placeholder="50"
+            value={spend}
+            onChange={(e) => setSpend(e.target.value)}
             className="w-full p-3 rounded-xl bg-zinc-900 border border-zinc-700"
           />
         </div>
@@ -41,11 +75,16 @@ export default function AuditPage() {
           <input
             type="number"
             placeholder="5"
+            value={teamSize}
+            onChange={(e) => setTeamSize(e.target.value)}
             className="w-full p-3 rounded-xl bg-zinc-900 border border-zinc-700"
           />
         </div>
 
-        <button className="w-full bg-white text-black py-3 rounded-xl font-semibold hover:scale-[1.02] transition">
+        <button
+          onClick={handleSubmit}
+          className="w-full bg-white text-black py-3 rounded-xl font-semibold hover:scale-[1.02] transition"
+        >
           Generate Audit
         </button>
 
