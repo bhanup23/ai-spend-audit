@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function AuditPage() {
@@ -15,6 +15,39 @@ export default function AuditPage() {
       spend: "",
     },
   ]);
+
+  // Load saved form on page refresh
+
+  useEffect(() => {
+
+    const savedData = localStorage.getItem("auditForm");
+
+    if (savedData) {
+
+      const parsedData = JSON.parse(savedData);
+
+      setTools(parsedData.tools || []);
+
+      setTeamSize(parsedData.teamSize || "");
+    }
+
+  }, []);
+
+  // Auto-save form changes
+
+  useEffect(() => {
+
+    const formData = {
+      tools,
+      teamSize,
+    };
+
+    localStorage.setItem(
+      "auditForm",
+      JSON.stringify(formData)
+    );
+
+  }, [tools, teamSize]);
 
   function handleToolChange(
     index: number,
@@ -50,10 +83,16 @@ export default function AuditPage() {
       teamSize,
     };
 
+    // Save final audit
+
     localStorage.setItem(
       "auditData",
       JSON.stringify(auditData)
     );
+
+    // Clear temporary form cache
+
+    localStorage.removeItem("auditForm");
 
     router.push("/results");
   }
@@ -61,7 +100,9 @@ export default function AuditPage() {
   return (
     <main className="min-h-screen bg-black text-white px-6 py-12">
 
-      <h1 className="text-5xl font-bold text-center">
+      {/* Heading */}
+
+      <h1 className="text-5xl font-bold text-center bg-gradient-to-r from-white to-zinc-500 bg-clip-text text-transparent">
         AI Spend Audit
       </h1>
 
@@ -77,7 +118,7 @@ export default function AuditPage() {
 
           <div
             key={index}
-            className="bg-zinc-900 border border-zinc-700 p-6 rounded-2xl"
+            className="bg-zinc-900 border border-zinc-700 p-6 rounded-2xl hover:border-zinc-500 hover:-translate-y-1"
           >
 
             <h2 className="text-2xl font-semibold mb-6">
@@ -86,7 +127,10 @@ export default function AuditPage() {
 
             <div className="space-y-5">
 
+              {/* Tool Name */}
+
               <div>
+
                 <label className="block mb-2 text-sm">
                   Tool Name
                 </label>
@@ -107,9 +151,13 @@ export default function AuditPage() {
                   <option>Cursor</option>
                   <option>GitHub Copilot</option>
                 </select>
+
               </div>
 
+              {/* Spend */}
+
               <div>
+
                 <label className="block mb-2 text-sm">
                   Monthly Spend ($)
                 </label>
@@ -127,6 +175,7 @@ export default function AuditPage() {
                   }
                   className="w-full p-3 rounded-xl bg-black border border-zinc-700"
                 />
+
               </div>
 
             </div>
@@ -157,16 +206,16 @@ export default function AuditPage() {
 
         <button
           onClick={addTool}
-          className="w-full border border-zinc-700 py-3 rounded-xl hover:bg-zinc-900 transition"
+          className="w-full border border-zinc-700 py-3 rounded-xl hover:bg-zinc-900 hover:scale-[1.02] active:scale-[0.98] transition"
         >
           + Add Another Tool
         </button>
 
-        {/* Submit */}
+        {/* Submit Button */}
 
         <button
           onClick={handleSubmit}
-          className="w-full bg-white text-black py-4 rounded-xl font-semibold hover:scale-[1.01] transition"
+          className="w-full bg-white text-black py-4 rounded-xl font-semibold hover:scale-[1.02] active:scale-[0.98] transition"
         >
           Generate Audit
         </button>
