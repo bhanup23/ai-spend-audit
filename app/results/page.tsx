@@ -27,11 +27,12 @@ export default function ResultsPage() {
 
   const audit = generateAudit(
     data.tool,
+    data.secondTool,
     Number(data.spend),
     Number(data.teamSize)
   );
 
-  const annualSavings = audit.savings * 12;
+  const annualSavings = audit.totalSavings * 12;
 
   return (
     <main className="min-h-screen bg-black text-white px-6 py-12">
@@ -59,7 +60,7 @@ export default function ResultsPage() {
         </p>
 
         <h2 className="text-7xl font-bold text-green-400 mt-4">
-          ${audit.savings}
+          ${audit.totalSavings}
         </h2>
 
         <p className="text-zinc-300 mt-6 text-xl">
@@ -79,49 +80,60 @@ export default function ResultsPage() {
           Recommendations
         </h3>
 
-        <div className="bg-zinc-900 border border-zinc-700 rounded-2xl p-6">
+<div className="space-y-6">
 
-          <div className="flex items-center justify-between">
+  {audit.recommendations.map((item: any, index: number) => (
 
-            <div>
-              <p className="text-zinc-400 text-sm">
-                Tool
-              </p>
+    <div
+      key={index}
+      className="bg-zinc-900 border border-zinc-700 rounded-2xl p-6"
+    >
 
-              <h4 className="text-2xl font-bold mt-1">
-                {data.tool}
-              </h4>
-            </div>
+      <div className="flex items-center justify-between">
 
-            <div className="text-right">
-              <p className="text-zinc-400 text-sm">
-                Savings
-              </p>
+        <div>
+          <p className="text-zinc-400 text-sm">
+            Tool
+          </p>
 
-              <p className="text-green-400 text-2xl font-bold">
-                ${audit.savings}/mo
-              </p>
-            </div>
-
-          </div>
-
-          <div className="mt-6">
-
-            <p className="text-zinc-400 text-sm">
-              Recommended Action
-            </p>
-
-            <p className="text-xl font-semibold mt-2">
-              {audit.recommendation}
-            </p>
-
-            <p className="text-zinc-400 mt-4 leading-7">
-              {audit.reason}
-            </p>
-
-          </div>
-
+          <h4 className="text-2xl font-bold mt-1">
+            {item.tool}
+          </h4>
         </div>
+
+        <div className="text-right">
+          <p className="text-zinc-400 text-sm">
+            Savings
+          </p>
+
+          <p className="text-green-400 text-2xl font-bold">
+            ${item.savings}/mo
+          </p>
+        </div>
+
+      </div>
+
+      <div className="mt-6">
+
+        <p className="text-zinc-400 text-sm">
+          Recommended Action
+        </p>
+
+        <p className="text-xl font-semibold mt-2">
+          {item.recommendation}
+        </p>
+
+        <p className="text-zinc-400 mt-4 leading-7">
+          {item.reason}
+        </p>
+
+      </div>
+
+    </div>
+
+  ))}
+
+</div>
 
       </div>
 

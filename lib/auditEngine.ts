@@ -1,58 +1,72 @@
-export function generateAudit(tool: string, spend: number, teamSize: number) {
+export function generateAudit(
+  tool: string,
+  secondTool: string,
+  spend: number,
+  teamSize: number
+) {
 
-  let savings = 0;
-  let recommendation = "";
-  let reason = "";
+  const recommendations = [];
+
+  let totalSavings = 0;
+
+  // Tool 1
 
   if (tool === "ChatGPT") {
 
     if (teamSize <= 2) {
 
-      savings = 40;
+      recommendations.push({
+        tool: "ChatGPT",
+        savings: 40,
+        recommendation: "Switch from Team to Plus",
+        reason:
+          "Small teams usually do not require Team features.",
+      });
 
-      recommendation = "Switch from Team to Plus";
-
-      reason =
-        "Small teams usually do not need Team features.";
+      totalSavings += 40;
 
     } else {
 
-      recommendation = "Current plan looks reasonable";
-
-      reason =
-        "Your team size justifies collaborative features.";
+      recommendations.push({
+        tool: "ChatGPT",
+        savings: 0,
+        recommendation: "Current plan looks reasonable",
+        reason:
+          "Your team size justifies collaborative features.",
+      });
     }
   }
 
-  if (tool === "Claude") {
+  // Tool 2
 
-    if (spend > 100) {
+  if (secondTool === "Claude") {
 
-      savings = 25;
+    recommendations.push({
+      tool: "Claude",
+      savings: 25,
+      recommendation: "Optimize Claude usage",
+      reason:
+        "You may qualify for cheaper API pricing or credits.",
+    });
 
-      recommendation = "Optimize Claude usage";
-
-      reason =
-        "Heavy API usage may qualify for cheaper alternatives or credits.";
-    }
+    totalSavings += 25;
   }
 
-  if (tool === "Cursor") {
+  if (secondTool === "Cursor") {
 
-    if (teamSize === 1) {
+    recommendations.push({
+      tool: "Cursor",
+      savings: 10,
+      recommendation: "Downgrade to Hobby plan",
+      reason:
+        "Solo developers often do not need premium features.",
+    });
 
-      savings = 10;
-
-      recommendation = "Use Hobby plan";
-
-      reason =
-        "Solo developers may not need premium features.";
-    }
+    totalSavings += 10;
   }
 
   return {
-    savings,
-    recommendation,
-    reason,
+    totalSavings,
+    recommendations,
   };
 }
