@@ -1,11 +1,29 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
-export default function ReportPage({ params }: any) {
+export default function ReportPage() {
+
+  const params = useParams();
+
+  const id = params.id;
 
   const [report, setReport] = useState<any>(null);
+
+  // Copy shareable link
+
+  function copyLink() {
+
+    navigator.clipboard.writeText(
+      window.location.href
+    );
+
+    alert("Report link copied!");
+  }
+
+  // Fetch report
 
   useEffect(() => {
 
@@ -14,12 +32,15 @@ export default function ReportPage({ params }: any) {
       const { data, error } = await supabase
         .from("audits")
         .select("*")
-        .eq("id", params.id)
+        .eq("id", id)
         .single();
 
       if (error) {
 
-        console.error(error);
+        console.error(
+          "Supabase fetch error:",
+          error
+        );
 
         return;
       }
@@ -27,9 +48,13 @@ export default function ReportPage({ params }: any) {
       setReport(data);
     }
 
-    fetchReport();
+    if (id) {
+      fetchReport();
+    }
 
-  }, [params.id]);
+  }, [id]);
+
+  // Loading state
 
   if (!report) {
 
@@ -45,6 +70,8 @@ export default function ReportPage({ params }: any) {
 
       <div className="max-w-4xl mx-auto">
 
+        {/* Header */}
+
         <h1 className="text-5xl font-bold text-center bg-gradient-to-r from-white to-zinc-500 bg-clip-text text-transparent">
           Public Audit Report
         </h1>
@@ -53,11 +80,24 @@ export default function ReportPage({ params }: any) {
           Shareable AI spend optimization report.
         </p>
 
-        {/* Hero */}
+        {/* Copy Link Button */}
 
-        <div className="mt-12 bg-zinc-900 border border-zinc-700 rounded-3xl p-10">
+        <div className="mt-10 flex justify-center">
 
-          <p className="text-zinc-400">
+          <button
+            onClick={copyLink}
+            className="bg-white text-black px-6 py-3 rounded-xl font-semibold hover:scale-[1.03] transition"
+          >
+            Copy Shareable Link
+          </button>
+
+        </div>
+
+        {/* Hero Card */}
+
+        <div className="mt-12 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 border border-zinc-700 rounded-3xl p-10 shadow-2xl">
+
+          <p className="text-zinc-400 text-lg">
             Estimated Monthly Savings
           </p>
 
@@ -75,7 +115,7 @@ export default function ReportPage({ params }: any) {
 
             <div
               key={index}
-              className="bg-zinc-900 border border-zinc-700 rounded-2xl p-6"
+              className="bg-zinc-900 border border-zinc-700 rounded-2xl p-6 hover:border-zinc-500 hover:-translate-y-1 transition"
             >
 
               <h3 className="text-2xl font-bold">

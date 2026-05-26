@@ -11,6 +11,8 @@ export default function ResultsPage() {
 
   const [data, setData] = useState<any>(null);
 
+  const [email, setEmail] = useState("");
+
   useEffect(() => {
 
     const savedData = localStorage.getItem("auditData");
@@ -37,7 +39,7 @@ export default function ResultsPage() {
 
   const annualSavings = audit.totalSavings * 12;
 
-  // Save audit and redirect to public report
+  // Save audit and redirect
 
   async function saveAudit() {
 
@@ -48,6 +50,7 @@ export default function ResultsPage() {
           tools: data.tools,
           team_size: Number(data.teamSize),
           total_savings: audit.totalSavings,
+          email,
         },
       ])
       .select();
@@ -170,6 +173,24 @@ export default function ResultsPage() {
           ))}
 
         </div>
+
+      </div>
+
+      {/* Email Capture */}
+
+      <div className="max-w-4xl mx-auto mt-12">
+
+        <label className="block mb-3 text-sm text-zinc-400">
+          Receive Full Audit by Email
+        </label>
+
+        <input
+          type="email"
+          placeholder="founder@startup.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="w-full p-4 rounded-2xl bg-zinc-900 border border-zinc-700"
+        />
 
       </div>
 
