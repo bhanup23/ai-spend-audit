@@ -13,9 +13,16 @@ export default function ResultsPage() {
 
   const [email, setEmail] = useState("");
 
+  const [loading, setLoading] = useState(false);
+
+  const [successMessage, setSuccessMessage] =
+    useState("");
+
   useEffect(() => {
 
-    const savedData = localStorage.getItem("auditData");
+    const savedData = localStorage.getItem(
+      "auditData"
+    );
 
     if (savedData) {
       setData(JSON.parse(savedData));
@@ -23,11 +30,23 @@ export default function ResultsPage() {
 
   }, []);
 
+  // Loading State
+
   if (!data) {
 
     return (
       <main className="min-h-screen bg-black text-white flex items-center justify-center">
-        Loading...
+
+        <div className="flex flex-col items-center gap-6">
+
+          <div className="w-12 h-12 border-4 border-zinc-700 border-t-white rounded-full animate-spin"></div>
+
+          <p className="text-zinc-400 text-lg">
+            Generating your AI audit...
+          </p>
+
+        </div>
+
       </main>
     );
   }
@@ -37,32 +56,47 @@ export default function ResultsPage() {
     Number(data.teamSize)
   );
 
-  const annualSavings = audit.totalSavings * 12;
+  const annualSavings =
+    audit.totalSavings * 12;
 
   // Save audit and redirect
 
   async function saveAudit() {
 
-    const { data: savedAudit, error } = await supabase
-      .from("audits")
-      .insert([
-        {
-          tools: data.tools,
-          team_size: Number(data.teamSize),
-          total_savings: audit.totalSavings,
-          email,
-        },
-      ])
-      .select();
+    setLoading(true);
+
+    const { data: savedAudit, error } =
+      await supabase
+        .from("audits")
+        .insert([
+          {
+            tools: data.tools,
+            team_size: Number(data.teamSize),
+            total_savings: audit.totalSavings,
+            email,
+          },
+        ])
+        .select();
+
+    setLoading(false);
 
     if (error) {
 
-      console.error("Supabase error:", error);
+      console.error(
+        "Supabase error:",
+        error
+      );
 
-      alert("Database connection failed");
+      setSuccessMessage(
+        "Database connection failed"
+      );
 
       return;
     }
+
+    setSuccessMessage(
+      "Audit saved successfully!"
+    );
 
     const auditId = savedAudit?.[0]?.id;
 
@@ -117,60 +151,62 @@ export default function ResultsPage() {
 
         <div className="space-y-6">
 
-          {audit.recommendations.map((item: any, index: number) => (
+          {audit.recommendations.map(
+            (item: any, index: number) => (
 
-            <div
-              key={index}
-              className="bg-zinc-900 border border-zinc-700 rounded-2xl p-6 hover:border-zinc-500 hover:-translate-y-1"
-            >
+              <div
+                key={index}
+                className="bg-zinc-900 border border-zinc-700 rounded-2xl p-6 hover:border-zinc-500 hover:-translate-y-1 transition"
+              >
 
-              <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between">
 
-                <div>
+                  <div>
 
-                  <p className="text-zinc-400 text-sm">
-                    Tool
-                  </p>
+                    <p className="text-zinc-400 text-sm">
+                      Tool
+                    </p>
 
-                  <h4 className="text-2xl font-bold mt-1">
-                    {item.tool}
-                  </h4>
+                    <h4 className="text-2xl font-bold mt-1">
+                      {item.tool}
+                    </h4>
+
+                  </div>
+
+                  <div className="text-right">
+
+                    <p className="text-zinc-400 text-sm">
+                      Savings
+                    </p>
+
+                    <p className="text-green-400 text-2xl font-bold">
+                      ${item.savings}/mo
+                    </p>
+
+                  </div>
 
                 </div>
 
-                <div className="text-right">
+                <div className="mt-6">
 
                   <p className="text-zinc-400 text-sm">
-                    Savings
+                    Recommended Action
                   </p>
 
-                  <p className="text-green-400 text-2xl font-bold">
-                    ${item.savings}/mo
+                  <p className="text-xl font-semibold mt-2">
+                    {item.recommendation}
+                  </p>
+
+                  <p className="text-zinc-400 mt-4 leading-7">
+                    {item.reason}
                   </p>
 
                 </div>
 
               </div>
 
-              <div className="mt-6">
-
-                <p className="text-zinc-400 text-sm">
-                  Recommended Action
-                </p>
-
-                <p className="text-xl font-semibold mt-2">
-                  {item.recommendation}
-                </p>
-
-                <p className="text-zinc-400 mt-4 leading-7">
-                  {item.reason}
-                </p>
-
-              </div>
-
-            </div>
-
-          ))}
+            )
+          )}
 
         </div>
 
@@ -188,21 +224,42 @@ export default function ResultsPage() {
           type="email"
           placeholder="founder@startup.com"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) =>
+            setEmail(e.target.value)
+          }
           className="w-full p-4 rounded-2xl bg-zinc-900 border border-zinc-700"
         />
 
       </div>
 
-      {/* Save + Share Button */}
+      {/* Success Message */}
+
+      {successMessage && (
+
+        <div className="max-w-4xl mx-auto mt-6">
+
+          <div className="bg-zinc-900 border border-zinc-700 rounded-2xl p-4 text-center text-zinc-300">
+            {successMessage}
+          </div>
+
+        </div>
+
+      )}
+
+      {/* Save Button */}
 
       <div className="max-w-4xl mx-auto mt-10">
 
         <button
           onClick={saveAudit}
-          className="w-full bg-green-500 text-black py-4 rounded-2xl font-bold hover:scale-[1.02]"
+          disabled={loading}
+          className="w-full bg-green-500 text-black py-4 rounded-2xl font-bold hover:scale-[1.02] transition disabled:opacity-50"
         >
-          Save & Generate Shareable Report
+
+          {loading
+            ? "Saving Report..."
+            : "Save & Generate Shareable Report"}
+
         </button>
 
       </div>
