@@ -1,66 +1,22 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
-export default function ReportPage() {
+export default async function ReportPage({
+  params,
+}: {
+  params: { id: string };
+}) {
 
-  const params = useParams();
+  const { data: report, error } = await supabase
+    .from("audits")
+    .select("*")
+    .eq("id", params.id)
+    .single();
 
-  const id = params.id;
-
-  const [report, setReport] = useState<any>(null);
-
-  // Copy shareable link
-
-  function copyLink() {
-
-    navigator.clipboard.writeText(
-      window.location.href
-    );
-
-    alert("Report link copied!");
-  }
-
-  // Fetch report
-
-  useEffect(() => {
-
-    async function fetchReport() {
-
-      const { data, error } = await supabase
-        .from("audits")
-        .select("*")
-        .eq("id", id)
-        .single();
-
-      if (error) {
-
-        console.error(
-          "Supabase fetch error:",
-          error
-        );
-
-        return;
-      }
-
-      setReport(data);
-    }
-
-    if (id) {
-      fetchReport();
-    }
-
-  }, [id]);
-
-  // Loading state
-
-  if (!report) {
+  if (error || !report) {
 
     return (
       <main className="min-h-screen bg-black text-white flex items-center justify-center">
-        Loading Report...
+        Report not found.
       </main>
     );
   }
@@ -80,20 +36,9 @@ export default function ReportPage() {
           Shareable AI spend optimization report.
         </p>
 
-        {/* Copy Link Button */}
+        
 
-        <div className="mt-10 flex justify-center">
-
-          <button
-            onClick={copyLink}
-            className="bg-white text-black px-6 py-3 rounded-xl font-semibold hover:scale-[1.03] transition"
-          >
-            Copy Shareable Link
-          </button>
-
-        </div>
-
-        {/* Hero Card */}
+        {/* Hero */}
 
         <div className="mt-12 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 border border-zinc-700 rounded-3xl p-10 shadow-2xl">
 
