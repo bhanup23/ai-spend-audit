@@ -3,13 +3,15 @@ import { supabase } from "@/lib/supabase";
 export default async function ReportPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+
+  const { id } = await params;
 
   const { data: report, error } = await supabase
     .from("audits")
     .select("*")
-    .eq("id", params.id)
+    .eq("id", id)
     .single();
 
   if (error || !report) {
@@ -35,8 +37,6 @@ export default async function ReportPage({
         <p className="text-center text-zinc-400 mt-4">
           Shareable AI spend optimization report.
         </p>
-
-        
 
         {/* Hero */}
 
